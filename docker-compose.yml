@@ -1,0 +1,44 @@
+services:
+  # "db" is the service name.
+  # Other Docker containers can use this name as the hostname
+  # when they want to connect to PostgreSQL.
+  db:
+
+    # Docker will download and run the official PostgreSQL 17 image.
+    image: postgres:17
+
+    environment:
+      # Creates the main PostgreSQL user when the database
+      # is initialized for the first time.
+      POSTGRES_USER: shivam
+
+      # Password for the PostgreSQL user above.
+      # Fine for local development, but production secrets
+      # should normally come from environment variables.
+      POSTGRES_PASSWORD: password
+
+      # PostgreSQL automatically creates this database
+      # when the container is initialized.
+      POSTGRES_DB: recruitment
+
+    ports:
+      # Format:
+      # <port on your computer>:<port inside the container>
+      #
+      # PostgreSQL listens on 5432 inside Docker.
+      # We expose it as 5433 on your machine so it doesn't
+      # conflict with a locally installed PostgreSQL server.
+      - "5433:5432"
+
+    volumes:
+      # PostgreSQL stores its actual database files inside
+      # /var/lib/postgresql/data.
+      #
+      # Mapping that directory to a Docker volume means
+      # your database survives container restarts/deletion.
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  # Creates a Docker-managed persistent volume called
+  # postgres_data.
+  postgres_data:
