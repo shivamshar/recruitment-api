@@ -84,4 +84,25 @@ def test_current_user():
     },
 )
     assert response.status_code == 200
-    
+
+
+def test_recruiter_login(recruiter_user):
+    login_response = client.post(
+        "/login",
+        data={
+            "username": recruiter_user.email,
+            "password": "password123",
+        },
+    )
+
+    token = login_response.json()["access_token"]
+
+    response = client.get(
+        "/recruiter-only",
+        headers={
+            "Authorization": f"Bearer {token}"
+        },
+    )
+
+    assert response.status_code == 200
+

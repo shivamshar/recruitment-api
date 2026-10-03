@@ -4,6 +4,7 @@ import pytest
 from app.database import Base
 from app.main import app
 from app.database import get_db
+from app import models, utils
 
 
 TEST_DATABASE_URL = "postgresql://shivam:password@localhost:5434/recruitment_test"
@@ -53,3 +54,22 @@ def clean_database():
     Base.metadata.create_all(bind=test_engine)
 
     yield
+
+@pytest.fixture()
+def recruiter_user():
+    db= TestingSessionLocal()
+    recruiter = models.User(
+    email="recruiter@test.com",
+    username="recruiter1",
+    password=utils.hash_password("password123"),
+    role=models.UserRole.RECRUITER,
+)
+
+    db.add(recruiter)
+    db.commit()
+    db.refresh(recruiter)
+
+    db.close()
+
+    return recruiter
+    

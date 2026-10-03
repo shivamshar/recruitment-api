@@ -1,3 +1,6 @@
+#it describes what our database should look like and provides a framework for alembic to make a table from 
+
+
 import enum
 
 from sqlalchemy import (

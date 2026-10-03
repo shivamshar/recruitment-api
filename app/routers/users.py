@@ -53,3 +53,14 @@ def Createuser(user: schemas.usercreate, db: Session= Depends(get_db)):
 def get_current_user(db: Session=Depends(get_db), curr_user: models.User=Depends(oauth2.get_current_user)):
     return curr_user
 
+
+@router.get("/recruiter-only")
+def recruiter_only(
+    current_user: models.User = Depends(
+        oauth2.required_role(models.UserRole.RECRUITER)
+    ),
+):
+    return {
+        "message": "Recruiter access granted",
+        "user_id": current_user.id,
+    }
