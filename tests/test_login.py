@@ -61,3 +61,27 @@ def test_wrong_login():
     response=client.post("/login", data = {"username": "testuser@example.com", "password": "password"})    #we add the wrong password
 
     assert response.status_code == 401
+
+
+def test_current_user():
+    client.post(
+            "/users",
+            json={
+                "email": "shivam@example.com",
+                "username": "user123",
+                "password": "password123",
+            },
+        )
+
+    login_response=client.post("/login", data = {"username": "shivam@example.com", "password": "password123"})
+
+    print(login_response.status_code)
+    print(login_response.json())
+
+    response = client.get(
+        "/users/me",  headers={
+        "Authorization": f"Bearer {login_response.json()["access_token"]}"
+    },
+)
+    assert response.status_code == 200
+    

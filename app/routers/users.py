@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app import models, schemas, utils
+from app import models, schemas, utils, oauth2
 from app.database import get_db, engine
 from typing import List
 
@@ -45,3 +45,11 @@ def Createuser(user: schemas.usercreate, db: Session= Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     return new_user
+
+
+
+#get current user that is logged in
+@router.get("/users/me", status_code=status.HTTP_200_OK, response_model=schemas.userout)
+def get_current_user(db: Session=Depends(get_db), curr_user: models.User=Depends(oauth2.get_current_user)):
+    return curr_user
+
