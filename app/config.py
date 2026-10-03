@@ -15,6 +15,11 @@ class Settings(BaseSettings):
     # Pydantic requires DATABASE_URL to exist.
     database_url: str
 
+    secret_key: str
+
+    algorithm: str
+
+    access_token_expire_minutes: int
     # Tell Pydantic to load variables from the .env file.
     #
     # env_file=".env"
