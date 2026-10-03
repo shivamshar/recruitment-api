@@ -106,3 +106,99 @@ def test_recruiter_login(recruiter_user):
 
     assert response.status_code == 200
 
+
+def test_admin_can_create_recruiter(admin_user):
+    login_response=client.post("/login", data = {"username": admin_user.email,
+                "password": "admin123"})
+
+    assert login_response.status_code == 200
+
+    token = login_response.json()["access_token"]
+
+    response = client.post(
+            "/admin/recruiters",
+            json={
+                "email": "testuser@example.com",
+                "username": "testuser",
+                "password": "password123",
+            },headers={
+            "Authorization": f"Bearer {token}"
+        },
+        )
+
+    data = response.json()
+    assert response.status_code == 201
+    assert data["email"] == "testuser@example.com"
+    assert data["username"] == "testuser"
+    assert data["role"] == "recruiter"
+    
+    
+def test_candidate_cannot_create_recruiter():
+    # candidate token
+    # call POST /admin/recruiters
+    # expect 403
+    client.post(
+            "/users",
+            json={
+                "email": "testuser@example.com",
+                "username": "testuser",
+                "password": "password123",
+            },
+        )
+    
+
+    login_response = client.post(
+            "/login",
+            data={
+                "username": "testuser@example.com",
+                "password": "password123",
+            },
+        )
+    
+    assert login_response.status_code == 200
+
+    token = login_response.json()["access_token"]
+    
+    response = client.post(
+            "/admin/recruiters",
+            json={
+                "email": "testuser@example.com",
+                "username": "testuser",
+                "password": "password123",
+            },headers={
+            "Authorization": f"Bearer {token}"
+        },
+        )
+
+    data = response.json()
+    assert response.status_code == 403
+
+
+def test_recruiter_cannot_create_recruiter(recruiter_user):
+    # recruiter token
+    # call POST /admin/recruiters
+    # expect 403
+    login_response = client.post(
+            "/login",
+            data={
+                "username": recruiter_user.email,
+                "password": "password123",
+            },
+        )
+    
+    token = login_response.json()["access_token"]
+    
+        
+    response = client.post(
+            "/admin/recruiters",
+            json={
+                "email": "testuser@example.com",
+                "username": "testuser",
+                "password": "password123",
+            },headers={
+            "Authorization": f"Bearer {token}"
+        },
+        )
+
+    data = response.json()
+    assert response.status_code == 403

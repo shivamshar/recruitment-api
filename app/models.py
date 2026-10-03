@@ -1,5 +1,5 @@
 #it describes what our database should look like and provides a framework for alembic to make a table from 
-
+from sqlalchemy import ForeignKey
 
 import enum
 
@@ -109,7 +109,87 @@ class User(Base):
         default=UserRole.CANDIDATE,
     )
 
+    company_id = Column(
+        Integer,
+        ForeignKey("companies.id"),
+        nullable=True,
+    )
+
     # Record when the user account was created.
+    created_at = Column(
+
+        # timezone=True tells SQLAlchemy/PostgreSQL that
+        # timestamps should carry timezone information.
+        DateTime(timezone=True),
+
+        # func.now() tells PostgreSQL itself to generate
+        # the current timestamp.
+        server_default=func.now(),
+    )
+
+
+class Company(Base):
+    """
+    SQLAlchemy model representing the users table.
+
+    One object of this class corresponds to one row
+    inside PostgreSQL.
+    """
+
+    # Name of the actual PostgreSQL table.
+    __tablename__ = "companies"
+
+    # Primary key uniquely identifies every user.
+    #
+    # PostgreSQL/SQLAlchemy will automatically generate
+    # increasing integer IDs.
+    id = Column(
+        Integer,
+        primary_key=True,
+        nullable=False,
+    )
+
+    # Name of company.
+    #
+    # unique=True:
+    # Two users cannot have the same email.
+    #
+    # nullable=False:
+    # Every user must have an email.
+    #
+    # index=True:
+    # PostgreSQL creates an index, which makes searches
+    # such as WHERE email = ... faster.
+    name = Column(
+        String,
+        unique=True,
+        nullable=False,
+        index=True,
+    )
+
+    # for the description of comapny that is optional
+    description = Column(
+        String,
+        unique=False,
+        nullable=True,
+    )
+
+    #website.
+    website = Column(
+        String,
+        nullable=False,
+    )
+
+    #location 
+
+    location = Column(
+            String,
+            nullable=False,
+        )
+
+    
+
+    # Record when the company account account was created.
     created_at = Column(
 
         # timezone=True tells SQLAlchemy/PostgreSQL that

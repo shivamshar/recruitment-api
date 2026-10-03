@@ -11,6 +11,26 @@ router = APIRouter(
         tags=["Users"],
 )
 
+
+#get_all_users
+
+@router.get("/userlist", response_model=List[schemas.userout])  #no need to login to access this feature
+def all_users(db: Session= Depends(get_db)):
+    try:
+        # cursor.execute(""" SELECT * FROM posts """)
+        # posts = cursor.fetchall()
+        users = db.query(models.User).all()
+        return users
+
+    except Exception as e:
+        db.rollback()
+        print("DATABASE ERROR:", e)
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
 @router.post("/users", status_code=status.HTTP_201_CREATED, response_model= schemas.userout)
 def Createuser(user: schemas.usercreate, db: Session= Depends(get_db)):
     # first we check if we have a duplicate username already registered

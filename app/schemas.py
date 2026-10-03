@@ -14,3 +14,20 @@ class userout(BaseModel):
     role: UserRole
 
     model_config = ConfigDict(from_attributes=True)
+
+class CompanyCreate(BaseModel):
+    name: str
+    location: str | None = None
+    website: str | None = None
+    description: str | None = None
+
+class CompanyOut(BaseModel):
+    name: str
+    id: int
+    location: str
+    website: str
+    description: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
