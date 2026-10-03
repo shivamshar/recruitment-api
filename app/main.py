@@ -1,8 +1,9 @@
 from fastapi import FastAPI
-from app.routers import users
+from app.routers import users, auth
 
 app=FastAPI(title='Recruitment API')
 app.include_router(users.router)
+app.include_router(auth.router)
 
 @app.get("/")
 def root():
@@ -21,4 +22,3 @@ def root():
 #
 # Without this line, FastAPI knows the router exists
 # in Python but won't expose its endpoints.
-app.include_router(users.router)

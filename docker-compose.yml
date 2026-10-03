@@ -38,6 +38,25 @@ services:
       # your database survives container restarts/deletion.
       - postgres_data:/var/lib/postgresql/data
 
+
+
+  #this is for testing database
+  test_db:
+    image: postgres:17
+
+    environment:
+      POSTGRES_USER: shivam
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: recruitment_test
+
+    ports:
+      # Different host port so it doesn't clash with db
+      - "5434:5432"
+
+    # No volume here:
+    # test data can be disposable
+
+
 volumes:
   # Creates a Docker-managed persistent volume called
   # postgres_data.
