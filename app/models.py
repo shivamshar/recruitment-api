@@ -2,6 +2,7 @@
 from sqlalchemy import ForeignKey
 
 import enum
+from sqlalchemy.orm import relationship
 
 from sqlalchemy import (
     Column,
@@ -200,3 +201,91 @@ class Company(Base):
         # the current timestamp.
         server_default=func.now(),
     )
+
+
+class Job(Base):
+    __tablename__ = "jobs"
+    
+        # Primary key uniquely identifies every user.
+        #
+        # PostgreSQL/SQLAlchemy will automatically generate
+        # increasing integer IDs.
+    id = Column(
+        Integer,
+        primary_key=True,
+        nullable=False,
+    )
+
+    # Name of company.
+    #
+    # unique=True:
+    # Two users cannot have the same email.
+    #
+    # nullable=False:
+    # Every user must have an email.
+    #
+    # index=True:
+    # PostgreSQL creates an index, which makes searches
+    # such as WHERE email = ... faster.
+    title = Column(
+        String,
+        unique=False,
+        nullable=False,
+        index=True,
+    )
+
+    # for the description of comapny that is optional
+    description = Column(
+        String,
+        unique=False,
+        nullable=True,
+    )
+
+    #location 
+
+    location = Column(
+            String,
+            nullable=False,
+        )
+
+    employment_type = Column(
+                String,
+                nullable=False,
+            )
+
+    company_id = Column(
+                Integer,
+                ForeignKey("companies.id"),
+                nullable=False,
+            )
+    
+    created_by = Column(
+            Integer,
+            ForeignKey("users.id"),
+            nullable=False,
+        )
+
+    
+
+    # Record when the company account account was created.
+    created_at = Column(
+
+        # timezone=True tells SQLAlchemy/PostgreSQL that
+        # timestamps should carry timezone information.
+        DateTime(timezone=True),
+
+        # func.now() tells PostgreSQL itself to generate
+        # the current timestamp.
+        server_default=func.now(),
+    )
+
+    company = relationship(
+    "Company",
+    foreign_keys=[company_id],
+)
+
+    creator = relationship(
+    "User",
+    foreign_keys=[created_by],
+)
+

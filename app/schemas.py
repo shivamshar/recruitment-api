@@ -30,4 +30,26 @@ class CompanyOut(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+class JobsCreate(BaseModel):
+    title: str
+    description: str | None = None
+    location: str
+    employment_type: str
+
+class JobsOut(BaseModel):
+    id: int
+    title: str
+    description: str | None
+    location: str
+    employment_type: str
+    company_id: int
+    created_by: int
+    company_name: str
+    recruiter_name: str
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
 
