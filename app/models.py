@@ -15,6 +15,7 @@ from sqlalchemy import (
 from sqlalchemy.sql import func
 
 from app.database import Base
+from sqlalchemy import UniqueConstraint
 
 
 class UserRole(str, enum.Enum):
@@ -34,6 +35,13 @@ class UserRole(str, enum.Enum):
     RECRUITER = "recruiter"
     ADMIN = "admin"
 
+class ApplicationStatus(str, enum.Enum):
+    APPLIED = "applied"
+    SCREENING = "screening"
+    INTERVIEW = "interview"
+    OFFERED = "offered"
+    REJECTED = "rejected"
+    WITHDRAWN = "withdrawn"
 
 class User(Base):
     """
@@ -210,6 +218,15 @@ class Job(Base):
         #
         # PostgreSQL/SQLAlchemy will automatically generate
         # increasing integer IDs.
+    
+    # Gives us a list of all applications
+    # submitted for this job.
+    applications = relationship(
+        "Application",
+        back_populates="job",
+    )
+
+
     id = Column(
         Integer,
         primary_key=True,
@@ -289,3 +306,58 @@ class Job(Base):
     foreign_keys=[created_by],
 )
 
+class Application(Base):
+    __tablename__ = "applications"
+
+    # Gives us access to the actual Job object
+    # associated with this application.
+    job = relationship(
+        "Job",
+        back_populates="applications",
+    )
+
+
+    # Prevent the same candidate from applying
+    # to the same job more than once.
+    __table_args__ = (
+    UniqueConstraint(
+        "candidate_id",
+        "job_id",
+        name="uq_candidate_job_application",
+    ),
+)
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        nullable=False,
+    )
+
+    candidate_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=False,
+    )
+
+    job_id = Column(
+        Integer,
+        ForeignKey("jobs.id"),
+        nullable=False,
+    )
+
+    status = Column(
+        Enum(ApplicationStatus),
+        nullable=False,
+        default=ApplicationStatus.APPLIED,
+    )
+
+    cover_letter = Column(
+        String,
+        nullable=True,
+    )
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )

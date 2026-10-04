@@ -53,3 +53,33 @@ class JobsOut(BaseModel):
 
 
 
+class ApplicationCreate(BaseModel):
+    # The candidate chooses which job they want to apply to.
+    job_id: int
+
+    # Optional message submitted with the application.
+    cover_letter: str | None = None
+
+class ApplicationOut(BaseModel):
+    # Application's database ID.
+    
+    message: str
+
+    id: int
+
+    # Job this application belongs to.
+    job_id: int
+
+    # Candidate who submitted the application.
+    candidate_id: int
+
+    # Useful QoL fields pulled from related tables.
+    candidate_name: str
+    title: str
+    location: str
+
+    # Current application status.
+    status: str
+
+    # Optional cover letter submitted by the candidate.
+    cover_letter: str | None = None
