@@ -54,8 +54,6 @@ def test_application_duplication(candidate_user, test_job):
     assert application_response1.status_code ==  409
     
 
-
-
 # invalid job_id → 404
 def test_invalid_job_id(candidate_user, test_job):
     login_response = client.post(
@@ -117,7 +115,50 @@ def test_no_token(recruiter_user, test_job):
 
     assert application_response.status_code ==  401
 
-# recruiter cannot apply → 403
-# admin cannot apply → 403
-# no token → 401
-# stored candidate_id, job_id, and default status are correct in the test DB
+#recruiter can fetch applications for jobs they created
+def test_recruiter_fetch_application(recruiter_user, test_job, create_application, candidate_user):
+    login_response = client.post(
+                    "/login",
+                    data={
+                        "username": recruiter_user.email,
+                        "password": "password123",
+                    },
+                )
+            
+        
+    token = login_response.json()["access_token"]
+
+    assert login_response.status_code == 200
+
+    # Call the recruiter-facing applications endpoint.
+    response = client.get(
+        "/applications/recruiter",
+        headers={
+            "Authorization": f"Bearer {token}"
+        },
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # The endpoint returns a list of applications.
+    assert len(data) >= 1
+
+    # Grab the first returned application.
+    application = data[0]
+
+    # Confirm this is the application created by our fixture.
+    assert application["id"] == create_application["id"]
+
+    # Confirm the candidate is correct.
+    assert application["candidate_id"] == candidate_user.id
+
+    # Confirm the job is correct.
+    assert application["job_id"] == test_job.id
+
+    # Confirm QoL fields are also returned correctly.
+    assert application["candidate_name"] == candidate_user.username
+    assert application["title"] == test_job.title
+
+
+

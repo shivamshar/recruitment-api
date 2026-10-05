@@ -92,6 +92,26 @@ def admin_user():
 
     return admin
 
+
+
+@pytest.fixture()
+def candidate_user():
+    db= TestingSessionLocal()
+    candidate = models.User(
+    email="candidate@test.com",
+    username="candidate",
+    password=utils.hash_password("candidate123"),
+    role=models.UserRole.CANDIDATE,
+)
+
+    db.add(candidate)
+    db.commit()
+    db.refresh(candidate)
+
+    db.close()
+
+    return candidate
+
 @pytest.fixture
 def test_job(recruiter_user):
     """
@@ -144,22 +164,34 @@ def test_job(recruiter_user):
     return job
 
 
-
-
 @pytest.fixture()
-def candidate_user():
-    db= TestingSessionLocal()
-    candidate = models.User(
-    email="candidate@test.com",
-    username="candidate",
-    password=utils.hash_password("candidate123"),
-    role=models.UserRole.CANDIDATE,
-)
+def create_application(candidate_user, recruiter_user, test_job):
+    db = TestingSessionLocal()
+    
+    application = models.Application(
+        candidate_id=candidate_user.id,
+        job_id=test_job.id,
+        cover_letter="Test application cover letter",
 
-    db.add(candidate)
+        # You can omit status if the model already defaults
+        # to ApplicationStatus.APPLIED.
+    )
+
+    db.add(application)
     db.commit()
-    db.refresh(candidate)
+    db.refresh(application)
+
+    # Store values before closing the session.
+    application_data = {
+        "id": application.id,
+        "candidate_id": application.candidate_id,
+        "job_id": application.job_id,
+        "status": application.status,
+    }
 
     db.close()
 
-    return candidate
+    return application_data
+
+
+

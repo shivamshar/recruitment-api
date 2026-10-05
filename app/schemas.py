@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict, EmailStr, conint
 from typing import Optional
-from app.models import UserRole
+from app.models import UserRole, ApplicationStatus
+from app import models
 
 class usercreate(BaseModel):
     email: EmailStr
@@ -83,3 +84,11 @@ class ApplicationOut(BaseModel):
 
     # Optional cover letter submitted by the candidate.
     cover_letter: str | None = None
+    
+    model_config = {
+            "from_attributes": True
+        }
+    
+
+class ApplicationUpdate(BaseModel):
+    status: models.ApplicationStatus
