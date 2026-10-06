@@ -306,6 +306,77 @@ class Job(Base):
     foreign_keys=[created_by],
 )
 
+class Interview(Base):
+    """
+    Represents an interview scheduled for a particular application.
+
+    One application may eventually have multiple interviews,
+    such as technical, HR, or final-round interviews.
+    """
+
+    __tablename__ = "interviews"
+
+    # Primary key for each interview.
+    id = Column(
+        Integer,
+        primary_key=True,
+        nullable=False,
+    )
+
+    # The application this interview belongs to.
+    #
+    # This connects:
+    # interview -> application -> candidate/job
+    application_id = Column(
+        Integer,
+        ForeignKey("applications.id"),
+        nullable=False,
+    )
+
+    # Date and time at which the interview is scheduled.
+    scheduled_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+    )
+
+    # Example values:
+    # "technical"
+    # "hr"
+    # "managerial"
+    # "final"
+    interview_type = Column(
+        String,
+        nullable=False,
+    )
+
+    # Can contain either a physical location
+    # or something like a Google Meet / Zoom link.
+    location_or_link = Column(
+        String,
+        nullable=True,
+    )
+
+    # Optional internal recruiter notes.
+    notes = Column(
+        String,
+        nullable=True,
+    )
+
+    # Stores which recruiter created/scheduled the interview.
+    created_by = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=False,
+    )
+
+    # Automatically records when this interview row was created.
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+
+
 class Application(Base):
     __tablename__ = "applications"
 

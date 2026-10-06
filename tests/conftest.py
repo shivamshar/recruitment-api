@@ -75,6 +75,26 @@ def recruiter_user():
 
 
 @pytest.fixture()
+def recruiter_user2():
+    db= TestingSessionLocal()
+    recruiter = models.User(
+    email="recruiter2@test.com",
+    username="recruiter2",
+    password=utils.hash_password("password123"),
+    role=models.UserRole.RECRUITER,
+)
+
+    db.add(recruiter)
+    db.commit()
+    db.refresh(recruiter)
+
+    db.close()
+
+    return recruiter
+
+
+
+@pytest.fixture()
 def admin_user():
     db= TestingSessionLocal()
     admin = models.User(

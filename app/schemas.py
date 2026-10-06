@@ -2,6 +2,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr, conint
 from typing import Optional
 from app.models import UserRole, ApplicationStatus
 from app import models
+from datetime import datetime
 
 class usercreate(BaseModel):
     email: EmailStr
@@ -92,3 +93,22 @@ class ApplicationOut(BaseModel):
 
 class ApplicationUpdate(BaseModel):
     status: models.ApplicationStatus
+
+
+class InterviewCreate(BaseModel):
+    application_id: int
+    scheduled_at: datetime
+    interview_type: str
+    location_or_link: str | None = None
+    notes: str | None = None
+
+
+class InterviewOut(BaseModel):
+    id: int
+    application_id: int
+    scheduled_at: datetime
+    interview_type: str
+    location_or_link: str | None
+    notes: str | None
+
+    model_config = ConfigDict(from_attributes=True)
