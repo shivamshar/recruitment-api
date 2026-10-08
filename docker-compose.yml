@@ -1,4 +1,24 @@
 services:
+
+  redis:
+    # Official Redis image.
+    # Redis 7 is mature and appropriate for what we're learning.
+    image: redis:7
+
+    # Give the container an easy-to-recognize name.
+    container_name: recruitment_redis
+
+    # Expose Redis to your computer.
+    #
+    # Left side  = port on your machine
+    # Right side = port inside the Redis container
+    ports:
+      - "6379:6379"
+
+    # Restart Redis automatically unless we explicitly stop it.
+    restart: unless-stopped
+
+
   # "db" is the service name.
   # Other Docker containers can use this name as the hostname
   # when they want to connect to PostgreSQL.

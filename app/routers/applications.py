@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app import models, schemas, oauth2
 from app.database import get_db
 from typing import List
+from app.tasks import application_submitted
 
 router = APIRouter(
     
@@ -52,6 +53,14 @@ def create_application(application: schemas.ApplicationCreate, db: Session= Depe
     db.add(applications)
     db.commit()
     db.refresh(applications)
+
+    # Queue background work.
+    #
+    # .delay() sends a task message to Redis.
+    # The Celery worker will execute it separately.
+    application_submitted.delay(applications.id)
+
+
     return {
     # Human-readable success message.
     "message": "Application is created successfully",
